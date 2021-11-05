@@ -25,6 +25,8 @@ const router = new Router(function () {
    * This will only be two single lines
    * If you did this right, you should see just 1 recipe card rendered to the screen
    */
+   document.querySelector('section.section--recipe-cards').classList.add("shown");
+   document.querySelector('section.section--recipe-expand').classList.remove("shown");
 });
 
 window.addEventListener('DOMContentLoaded', init);
@@ -119,6 +121,37 @@ function createRecipeCards() {
    * After this step you should see multiple cards rendered like the end of the last
    * lab
    */
+
+  for(let i = 1; i < recipes.length; i++){
+    const recipeCard = document.createElement('recipe-card');
+    recipeCard.data = recipeData[recipes[i]];
+    const page = recipeData[recipes[i]]['page-name'];
+    
+    if (i > 2){
+      router.addPage(page, function() {
+        document.querySelector('.section--recipe-cards').classList.remove('shown');
+        document.querySelector('.section--recipe-expand').classList.add('shown');
+        document.querySelector('recipe-expand').data = recipeData[recipes[i]];
+      }); 
+      bindRecipeCard(recipeCard, page);
+      document.querySelector('.recipe-cards--wrapper').appendChild(recipeCard);
+      recipeCard.classList.add('hidden');
+    }else{
+      router.addPage(page, function() {
+        document.querySelector('.section--recipe-cards').classList.remove('shown');
+        document.querySelector('.section--recipe-expand').classList.add('shown');
+        document.querySelector('recipe-expand').data = recipeData[recipes[i]];
+      });
+      bindRecipeCard(recipeCard, page);
+      document.querySelector('.recipe-cards--wrapper').appendChild(recipeCard);
+    }
+    
+    
+  }
+
+  
+
+
 }
 
 /**
@@ -159,7 +192,8 @@ function bindShowMore() {
 function bindRecipeCard(recipeCard, pageName) {
   recipeCard.addEventListener('click', e => {
     if (e.path[0].nodeName == 'A') return;
-    router.navigate(pageName);
+    console.log("made it");
+    router.navigate(pageName, false);
   });
 }
 
@@ -174,6 +208,13 @@ function bindEscKey() {
    * if the escape key is pressed, use your router to navigate() to the 'home'
    * page. This will let us go back to the home page from the detailed page.
    */
+  document.addEventListener('keydown',function(event){
+    
+    if(event.key == "Escape"){
+      router.navigate('home',false);
+    }
+
+  });
 }
 
 /**
@@ -195,4 +236,16 @@ function bindPopstate() {
    * so your navigate() function does not add your going back action to the history,
    * creating an infinite loop
    */
+  
+  window.addEventListener('popstate', function(event){
+    
+    console.log("state is",event.state);
+    //console.log("key_state is",event.state.key_state);
+    if(event.state != null && event.state.key_state != null){
+      router.navigate(event.state.key_state, true);
+
+    }else{
+      router.navigate('home',true);
+    }
+  });
 }
