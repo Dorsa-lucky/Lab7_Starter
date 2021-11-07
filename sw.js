@@ -2,6 +2,14 @@
 //         so do not move it next to the other scripts
 
 const CACHE_NAME = 'lab-7-starter';
+const urlsToCache = [
+  'https://introweb.tech/assets/json/ghostCookies.json',
+  'https://introweb.tech/assets/json/birthdayCake.json',
+  'https://introweb.tech/assets/json/chocolateChip.json',
+  'https://introweb.tech/assets/json/stuffing.json',
+  'https://introweb.tech/assets/json/turkey.json',
+  'https://introweb.tech/assets/json/pumpkinPie.json'
+];
 
 // Once the service worker has been installed, feed it some initial URLs to cache
 self.addEventListener('install', function (event) {
@@ -43,7 +51,21 @@ self.addEventListener('fetch', function (event) {
       if(response){
         return response;
       }
-      return fetch(event.request);
+      return fetch(event.request).then(
+        function(response){
+          if(!response || response.status !== 200 || response.type !== "basic"){
+            return response;
+          }
+          var responseToCache = response.clone();
+
+          caches.open(CACHE_NAME)
+          .then(function(cache){
+            cache.put(event.request, responseToCache);
+          });
+
+          return response;
+        }
+      );
     }
     )
   );
