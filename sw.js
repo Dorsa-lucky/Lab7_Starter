@@ -9,6 +9,13 @@ self.addEventListener('install', function (event) {
    * TODO - Part 2 Step 2
    * Create a function as outlined above
    */
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+    .then(function(cache){
+      console.log('Opened cache');
+      return cache.addAll(urlsToCache); // should I add the urls???
+    })
+  );
 });
 
 /**
@@ -21,6 +28,7 @@ self.addEventListener('activate', function (event) {
    * TODO - Part 2 Step 3
    * Create a function as outlined above, it should be one line
    */
+  ServiceWorkerRegistration.active;
 });
 
 // Intercept fetch requests and store them in the cache
@@ -29,4 +37,14 @@ self.addEventListener('fetch', function (event) {
    * TODO - Part 2 Step 4
    * Create a function as outlined above
    */
+  event.respondWith(
+    caches.match(event.request)
+    .then(function(response){
+      if(response){
+        return response;
+      }
+      return fetch(event.request);
+    }
+    )
+  );
 });
